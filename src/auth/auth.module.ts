@@ -6,11 +6,16 @@ import { UsersModule } from 'src/users/users.module';
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
+import { jwtConfig } from 'src/config/config';
 
 @Module({
   imports: [
     JwtModule.registerAsync({
-      imports: [ConfigModule],
+      imports: [ConfigModule.forRoot({
+        load: [jwtConfig],
+        envFilePath: `${process.cwd()}/.env.${process.env.NODE_ENV || 'development'
+          }`,
+      })],
       useFactory: (configService: ConfigService) => configService.get("jwt"),
       inject: [ConfigService]
     }),

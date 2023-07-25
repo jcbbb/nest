@@ -1,11 +1,13 @@
-import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent, Context } from '@nestjs/graphql';
 import { EventsService } from './events.service';
 import { Event } from './entities/event.entity';
 import { CreateEventInput } from './dto/create-event.input';
 import { UpdateEventInput } from './dto/update-event.input';
 import { UsersService } from 'src/users/users.service';
 import { Inject } from '@nestjs/common';
-import { Public } from 'src/auth/decorators/public.decorator';
+import { User } from 'src/users/entities/user.entity';
+import { DecodedToken } from 'src/auth/interfaces/auth.interface';
+import { LocationsService } from 'src/locations/locations.service';
 
 @Resolver(() => Event)
 export class EventsResolver {
@@ -13,16 +15,16 @@ export class EventsResolver {
     @Inject(UsersService)
     private readonly usersService: UsersService,
     private readonly eventsService: EventsService,
+    private readonly locationsService: LocationsService,
   ) { }
 
   @Mutation(() => Event)
-  createEvent(@Args('createEventInput') createEventInput: CreateEventInput) {
-    return this.eventsService.create(createEventInput);
+  createEvent(@Args('createEventInput') createEventInput: CreateEventInput, @Context("token") token: DecodedToken) {
+    return this.eventsService.create(createEventInput, token);
   }
 
-  @Public()
   @Query(() => [Event], { name: 'events' })
-  findAll() {
+  findAll(@Context("user") user: User) {
     return this.eventsService.findAll();
   }
 
@@ -34,6 +36,11 @@ export class EventsResolver {
   @ResolveField()
   participants(@Parent() event: Event) {
     return this.eventsService.getParticipants(event.id)
+  }
+
+  @ResolveField()
+  location(@Parent() event: Event) {
+    return this.locationsService.findOne(event.location_id)
   }
 
   @ResolveField()

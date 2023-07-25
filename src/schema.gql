@@ -9,7 +9,7 @@ type User {
 
 type Location {
   id: Int!
-  title: String!
+  name: String!
   creator: User!
   address: String!
 }
@@ -75,13 +75,13 @@ input UpdateEventInput {
 }
 
 input CreateUserInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  username: String!
+  password: String!
 }
 
 input UpdateUserInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  username: String
+  password: String
   id: Int!
 }
 
@@ -91,12 +91,12 @@ input AuthInput {
 }
 
 input CreateLocationInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  name: String!
+  address: String!
 }
 
 input UpdateLocationInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  name: String
+  address: String
   id: Int!
 }

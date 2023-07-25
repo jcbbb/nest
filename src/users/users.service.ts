@@ -12,8 +12,14 @@ export class UsersService {
     private readonly usersReposity: Repository<User>,
   ) { }
 
-  create(createUserInput: CreateUserInput) {
-    return 'This action adds a new user';
+  async create(createUserInput: CreateUserInput) {
+    const { username, password } = createUserInput;
+    const entity = this.usersReposity.create({
+      username,
+      password
+    });
+
+    return this.usersReposity.save(entity);
   }
 
   findAll() {

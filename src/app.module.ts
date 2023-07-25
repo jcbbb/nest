@@ -9,7 +9,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { UsersModule } from './users/users.module';
-import { dbConfig } from './config/config';
+import { dbConfig, jwtConfig } from './config/config';
 import { AuthModule } from './auth/auth.module';
 
 @Module({

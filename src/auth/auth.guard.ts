@@ -27,9 +27,8 @@ export class AuthGuard implements CanActivate {
 
     if (isPublic) return true
 
-    const ctx = GqlExecutionContext.create(context);
-    const req = ctx.getContext().req;
-    const token = this.extractTokenFromHeader(req);
+    const ctx = GqlExecutionContext.create(context).getContext();
+    const token = this.extractTokenFromHeader(ctx.req);
     if (!token) {
       throw new UnauthorizedException();
     }
@@ -41,9 +40,8 @@ export class AuthGuard implements CanActivate {
           secret: this.configService.get("jwt.secret")
         }
       );
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      //request['user'] = payload;
+
+      ctx.token = payload;
     } catch {
       throw new UnauthorizedException();
     }

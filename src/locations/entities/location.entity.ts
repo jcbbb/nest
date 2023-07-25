@@ -17,7 +17,10 @@ export class Location {
 
   @Column({ length: 255 })
   @Field()
-  title: string;
+  name: string;
+
+  @Column()
+  created_by: number;
 
   @Field()
   @OneToOne(() => User)

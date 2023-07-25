@@ -1,4 +1,4 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
 export class AuthInput {
@@ -7,10 +7,4 @@ export class AuthInput {
 
   @Field()
   password: string
-}
-
-@InputType()
-export class CreateAuthInput {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
 }

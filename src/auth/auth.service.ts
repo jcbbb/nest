@@ -7,22 +7,23 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
-  ) {
-  }
+    private jwtService: JwtService,
+  ) { }
 
   async login(authInput: AuthInput) {
     const user = await this.usersService.findByUsername(authInput.username);
-    const isValid = user.verifyPassword(authInput.password);
+    const isValid = await user.verifyPassword(authInput.password);
     if (!isValid) {
-      throw new UnauthorizedException()
+      throw new UnauthorizedException();
     }
 
-    const payload = { sub: user.id, username: user.username }
-    return { access_token: await this.jwtService.signAsync(payload) }
+    const payload = { sub: user.id, username: user.username };
+    return { access_token: await this.jwtService.signAsync(payload) };
   }
 
-  signup(authInput: AuthInput) {
-    return `This action returns all auth`;
+  async signup(authInput: AuthInput) {
+    const user = await this.usersService.create(authInput)
+    const payload = { sub: user.id, username: user.username }
+    return { access_token: await this.jwtService.signAsync(payload) }
   }
 }

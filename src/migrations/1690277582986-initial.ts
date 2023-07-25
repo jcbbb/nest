@@ -13,7 +13,7 @@ export class Initial1690277582986 implements MigrationInterface {
         id serial primary key,
         name varchar(255) not null,
         address varchar(255) not null,
-        created_by int not null,
+        created_y int not null,
 
         constraint fk_users_id foreign key (created_by) references users(id) on delete cascade
       );
