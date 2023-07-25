@@ -5,6 +5,7 @@ import { CreateEventInput } from './dto/create-event.input';
 import { UpdateEventInput } from './dto/update-event.input';
 import { UsersService } from 'src/users/users.service';
 import { Inject } from '@nestjs/common';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Resolver(() => Event)
 export class EventsResolver {
@@ -19,6 +20,7 @@ export class EventsResolver {
     return this.eventsService.create(createEventInput);
   }
 
+  @Public()
   @Query(() => [Event], { name: 'events' })
   findAll() {
     return this.eventsService.findAll();

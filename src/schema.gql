@@ -51,10 +51,10 @@ type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
+  createAuth(createAuthInput: CreateAuthInput!): Auth!
   createLocation(createLocationInput: CreateLocationInput!): Location!
   updateLocation(updateLocationInput: UpdateLocationInput!): Location!
   removeLocation(id: Int!): Location!
-  createAuth(createAuthInput: CreateAuthInput!): Auth!
 }
 
 input CreateEventInput {
@@ -85,6 +85,11 @@ input UpdateUserInput {
   id: Int!
 }
 
+input CreateAuthInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 input CreateLocationInput {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -94,9 +99,4 @@ input UpdateLocationInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
-}
-
-input CreateAuthInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
 }
