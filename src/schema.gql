@@ -31,8 +31,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Auth {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  access_token: String!
 }
 
 type Query {
@@ -51,7 +50,8 @@ type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
-  createAuth(createAuthInput: CreateAuthInput!): Auth!
+  login(authInput: AuthInput!): Auth!
+  signup(authInput: AuthInput!): Auth!
   createLocation(createLocationInput: CreateLocationInput!): Location!
   updateLocation(updateLocationInput: UpdateLocationInput!): Location!
   removeLocation(id: Int!): Location!
@@ -85,9 +85,9 @@ input UpdateUserInput {
   id: Int!
 }
 
-input CreateAuthInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+input AuthInput {
+  username: String!
+  password: String!
 }
 
 input CreateLocationInput {

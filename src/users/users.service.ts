@@ -24,6 +24,10 @@ export class UsersService {
     return this.usersReposity.findOne({ where: { id } })
   }
 
+  findByUsername(username: string) {
+    return this.usersReposity.findOne({ where: { username } })
+  }
+
   update(id: number, updateUserInput: UpdateUserInput) {
     return `This action updates a #${id} user`;
   }
