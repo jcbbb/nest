@@ -10,10 +10,14 @@ export class EventsService {
   constructor(
     @InjectRepository(Event)
     private readonly eventsRepository: Repository<Event>,
-  ) {}
+  ) { }
 
   create(createEventInput: CreateEventInput) {
-    return 'This action adds a new event';
+    return this.eventsRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Event)
+      .values({ ...createEventInput, created_by: 1 }).execute()
   }
 
   findAll() {
@@ -21,7 +25,7 @@ export class EventsService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} event`;
+    return this.eventsRepository.findOne({ where: { id } })
   }
 
   update(id: number, updateEventInput: UpdateEventInput) {
@@ -30,5 +34,9 @@ export class EventsService {
 
   remove(id: number) {
     return `This action removes a #${id} event`;
+  }
+
+  getParticipants(id: number) {
+    return this.eventsRepository.createQueryBuilder().relation(Event, "participants").of(id).loadMany();
   }
 }

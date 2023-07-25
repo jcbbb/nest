@@ -8,24 +8,23 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
-@Entity()
+@Entity({ name: "locations" })
 @ObjectType()
 export class Location {
   @PrimaryGeneratedColumn()
   @Field(() => Int)
   id: number;
 
-  @Column()
+  @Column({ length: 255 })
   @Field()
   title: string;
 
-  @Column()
   @Field()
   @OneToOne(() => User)
-  @JoinColumn()
+  @JoinColumn({ name: "created_by" })
   creator: User;
 
-  @Column()
+  @Column({ length: 255 })
   @Field()
   address: string;
 }

@@ -5,7 +5,6 @@
 type User {
   id: Int!
   username: String!
-  password: String!
 }
 
 type Location {
@@ -21,6 +20,7 @@ type Event {
   description: String!
   creator: User!
   location: Location!
+  participants: [User!]!
   start_at: DateTime!
   end_at: DateTime!
 }
@@ -30,33 +30,56 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Auth {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 type Query {
   events: [Event!]!
   event(id: Int!): Event!
-  locations: [Location!]!
-  location(id: Int!): Location!
   users: [User!]!
   user(id: Int!): User!
+  locations: [Location!]!
+  location(id: Int!): Location!
 }
 
 type Mutation {
   createEvent(createEventInput: CreateEventInput!): Event!
   updateEvent(updateEventInput: UpdateEventInput!): Event!
   removeEvent(id: Int!): Event!
-  createLocation(createLocationInput: CreateLocationInput!): Location!
-  updateLocation(updateLocationInput: UpdateLocationInput!): Location!
-  removeLocation(id: Int!): Location!
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
+  createLocation(createLocationInput: CreateLocationInput!): Location!
+  updateLocation(updateLocationInput: UpdateLocationInput!): Location!
+  removeLocation(id: Int!): Location!
+  createAuth(createAuthInput: CreateAuthInput!): Auth!
 }
 
 input CreateEventInput {
+  title: String!
+  description: String!
+  end_at: DateTime!
+  start_at: DateTime!
+  location_id: Float!
+}
+
+input UpdateEventInput {
+  title: String
+  description: String
+  end_at: DateTime
+  start_at: DateTime
+  location_id: Float
+  id: Int!
+}
+
+input CreateUserInput {
   """Example field (placeholder)"""
   exampleField: Int!
 }
 
-input UpdateEventInput {
+input UpdateUserInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
@@ -73,13 +96,7 @@ input UpdateLocationInput {
   id: Int!
 }
 
-input CreateUserInput {
+input CreateAuthInput {
   """Example field (placeholder)"""
   exampleField: Int!
-}
-
-input UpdateUserInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
 }

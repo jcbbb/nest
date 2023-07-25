@@ -9,6 +9,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { UsersModule } from './users/users.module';
+import { dbConfig } from './config/config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,23 +19,22 @@ import { UsersModule } from './users/users.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     ConfigModule.forRoot({
-      envFilePath: `${process.cwd()}/.env.${
-        process.env.NODE_ENV || 'development'
-      }`,
+      isGlobal: true,
+      load: [dbConfig],
+      envFilePath: `${process.cwd()}/.env.${process.env.NODE_ENV || 'development'
+        }`,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        url: configService.get('POSTGRES_URI'),
-      }),
+      useFactory: (configService: ConfigService) => configService.get("database"),
       inject: [ConfigService],
     }),
     EventsModule,
     LocationsModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

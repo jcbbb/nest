@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private readonly usersReposity: Repository<User>,
+  ) { }
+
   create(createUserInput: CreateUserInput) {
     return 'This action adds a new user';
   }
@@ -13,7 +21,7 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.usersReposity.findOne({ where: { id } })
   }
 
   update(id: number, updateUserInput: UpdateUserInput) {
