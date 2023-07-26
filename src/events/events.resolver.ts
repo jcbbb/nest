@@ -4,10 +4,13 @@ import { DeletedEvent, Event } from './entities/event.entity';
 import { CreateEventInput } from './dto/create-event.input';
 import { UpdateEventInput } from './dto/update-event.input';
 import { UsersService } from 'src/users/users.service';
-import { Inject } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 import { LocationsService } from 'src/locations/locations.service';
 import { FilterEventInput } from './dto/filter-event.input';
+import { PolicyGuard } from 'src/auth/policy.guard';
+import { CheckPolicies } from 'src/auth/decorators/policy.decorator';
+import { Action, AppAbility } from 'src/casl/casl-ability.factory';
 
 @Resolver(() => Event)
 export class EventsResolver {
@@ -28,6 +31,8 @@ export class EventsResolver {
     return this.eventsService.findAll(token.sub, filterEventInput);
   }
 
+  @UseGuards(PolicyGuard)
+  @CheckPolicies((ability: AppAbility) => ability.can(Action.Read, Event))
   @Query(() => Event, { name: 'event' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.eventsService.findOne(id);

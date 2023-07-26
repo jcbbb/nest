@@ -7,9 +7,10 @@ import { UsersModule } from "../users/users.module";
 import { AuthModule } from 'src/auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
 import { LocationsModule } from 'src/locations/locations.module';
+import { CaslModule } from 'src/casl/casl.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Event]), UsersModule, AuthModule, LocationsModule],
+  imports: [TypeOrmModule.forFeature([Event]), UsersModule, AuthModule, LocationsModule, CaslModule],
   providers: [EventsResolver, EventsService, JwtService],
 })
 export class EventsModule { }
