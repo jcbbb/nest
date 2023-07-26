@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthInput } from './dto/create-auth.input';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { verify } from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,7 @@ export class AuthService {
 
   async login(authInput: AuthInput) {
     const user = await this.usersService.findByUsername(authInput.username);
-    const isValid = await user.verifyPassword(authInput.password);
+    const isValid = await verify(user.password, authInput.password);
     if (!isValid) {
       throw new UnauthorizedException();
     }

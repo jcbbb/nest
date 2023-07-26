@@ -31,3 +31,9 @@ export class Location {
   @Field()
   address: string;
 }
+
+@ObjectType()
+export class DeletedLocation {
+  @Field(() => Int)
+  id: number;
+}

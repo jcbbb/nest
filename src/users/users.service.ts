@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { hash } from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -14,12 +15,17 @@ export class UsersService {
 
   async create(createUserInput: CreateUserInput) {
     const { username, password } = createUserInput;
-    const entity = this.usersReposity.create({
-      username,
-      password
-    });
+    const { identifiers } = await this.usersReposity
+      .createQueryBuilder()
+      .insert()
+      .into(User)
+      .values({
+        username,
+        password: await hash(password)
+      })
+      .execute()
 
-    return this.usersReposity.save(entity);
+    return { username, id: identifiers[0].id }
   }
 
   findAll() {
@@ -30,8 +36,10 @@ export class UsersService {
     return this.usersReposity.findOne({ where: { id } })
   }
 
-  findByUsername(username: string) {
-    return this.usersReposity.findOne({ where: { username } })
+  async findByUsername(username: string) {
+    const user = await this.usersReposity.findOne({ where: { username } })
+    if (!user) throw new NotFoundException(`User with ${username} not found`)
+    return user;
   }
 
   update(id: number, updateUserInput: UpdateUserInput) {

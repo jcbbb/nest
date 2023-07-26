@@ -60,3 +60,9 @@ export class Event {
   @Field()
   end_at: Date;
 }
+
+@ObjectType()
+export class DeletedEvent {
+  @Field(() => Int)
+  id: number;
+}

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventInput } from './dto/create-event.input';
 import { UpdateEventInput } from './dto/update-event.input';
 import { Repository } from 'typeorm';
@@ -13,29 +13,51 @@ export class EventsService {
     private readonly eventsRepository: Repository<Event>,
   ) { }
 
-  create(createEventInput: CreateEventInput, token: DecodedToken) {
+  async create(createEventInput: CreateEventInput, token: DecodedToken) {
     const { title, description, end_at, start_at, location_id } = createEventInput;
-    const entity = this.eventsRepository.create({
-      title, description, end_at, start_at, location_id, created_by: token.sub
-    });
+    const { identifiers } = await this.eventsRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Event)
+      .values({
+        title, description, end_at, start_at, location_id, created_by: token.sub
+      })
+      .execute();
 
-    return this.eventsRepository.save(entity)
+    return { title, description, end_at, start_at, location_id, created_by: token.sub, id: identifiers[0].id }
   }
 
-  findAll() {
-    return this.eventsRepository.find();
+  findAll(id: number) {
+    return this.eventsRepository.find({ where: { created_by: id } });
   }
 
-  findOne(id: number) {
-    return this.eventsRepository.findOne({ where: { id } })
+  async findOne(id: number) {
+    const result = await this.eventsRepository.findOne({ where: { id } })
+    if (!result) throw new NotFoundException()
+    return result;
   }
 
-  update(id: number, updateEventInput: UpdateEventInput) {
-    return `This action updates a #${id} event`;
+  async update(id: number, updateEventInput: UpdateEventInput) {
+    const { title, description, end_at, start_at, location_id } = updateEventInput;
+    const result = await this.eventsRepository.createQueryBuilder().update(Event).set({
+      title,
+      description,
+      end_at,
+      start_at,
+      location_id
+    })
+      .where({ id })
+      .returning(["title", "description", "end_at", "start_at", "location_id", "id"]).execute()
+
+    if (!result.affected) {
+      throw new NotFoundException()
+    }
+
+    return result.raw[0]
   }
 
   remove(id: number) {
-    return `This action removes a #${id} event`;
+    return this.eventsRepository.delete(id);
   }
 
   getParticipants(id: number) {

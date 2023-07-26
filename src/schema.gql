@@ -14,6 +14,10 @@ type Location {
   address: String!
 }
 
+type DeletedLocation {
+  id: Int!
+}
+
 type Event {
   id: Int!
   title: String!
@@ -29,6 +33,10 @@ type Event {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type DeletedEvent {
+  id: Int!
+}
 
 type Auth {
   access_token: String!
@@ -46,7 +54,7 @@ type Query {
 type Mutation {
   createEvent(createEventInput: CreateEventInput!): Event!
   updateEvent(updateEventInput: UpdateEventInput!): Event!
-  removeEvent(id: Int!): Event!
+  removeEvent(id: Int!): DeletedEvent!
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
@@ -54,7 +62,7 @@ type Mutation {
   signup(authInput: AuthInput!): Auth!
   createLocation(createLocationInput: CreateLocationInput!): Location!
   updateLocation(updateLocationInput: UpdateLocationInput!): Location!
-  removeLocation(id: Int!): Location!
+  removeLocation(id: Int!): DeletedLocation!
 }
 
 input CreateEventInput {
@@ -71,7 +79,7 @@ input UpdateEventInput {
   end_at: DateTime
   start_at: DateTime
   location_id: Float
-  id: Int!
+  id: Float!
 }
 
 input CreateUserInput {
@@ -98,5 +106,5 @@ input CreateLocationInput {
 input UpdateLocationInput {
   name: String
   address: String
-  id: Int!
+  id: Float!
 }

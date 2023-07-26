@@ -1,11 +1,10 @@
 import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent, Context } from '@nestjs/graphql';
 import { EventsService } from './events.service';
-import { Event } from './entities/event.entity';
+import { DeletedEvent, Event } from './entities/event.entity';
 import { CreateEventInput } from './dto/create-event.input';
 import { UpdateEventInput } from './dto/update-event.input';
 import { UsersService } from 'src/users/users.service';
 import { Inject } from '@nestjs/common';
-import { User } from 'src/users/entities/user.entity';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 import { LocationsService } from 'src/locations/locations.service';
 
@@ -24,8 +23,8 @@ export class EventsResolver {
   }
 
   @Query(() => [Event], { name: 'events' })
-  findAll(@Context("user") user: User) {
-    return this.eventsService.findAll();
+  findAll(@Context("token") token: DecodedToken) {
+    return this.eventsService.findAll(token.sub);
   }
 
   @Query(() => Event, { name: 'event' })
@@ -53,8 +52,9 @@ export class EventsResolver {
     return this.eventsService.update(updateEventInput.id, updateEventInput);
   }
 
-  @Mutation(() => Event)
-  removeEvent(@Args('id', { type: () => Int }) id: number) {
-    return this.eventsService.remove(id);
+  @Mutation(() => DeletedEvent)
+  async removeEvent(@Args('id', { type: () => Int }) id: number) {
+    await this.eventsService.remove(id);
+    return { id }
   }
 }

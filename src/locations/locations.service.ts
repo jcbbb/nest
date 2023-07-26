@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLocationInput } from './dto/create-location.input';
 import { UpdateLocationInput } from './dto/update-location.input';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Location } from './entities/location.entity';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 
@@ -12,30 +12,44 @@ export class LocationsService {
     @InjectRepository(Location)
     private readonly locationsRepository: Repository<Location>,
   ) { }
-  create(createLocationInput: CreateLocationInput, token: DecodedToken) {
+  async create(createLocationInput: CreateLocationInput, token: DecodedToken) {
     const { name, address } = createLocationInput;
-    const entity = this.locationsRepository.create({
-      name,
-      address,
-      created_by: token.sub
-    });
+    const { identifiers } = await this.locationsRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Location)
+      .values({ name, address, created_by: token.sub })
+      .execute()
 
-    return this.locationsRepository.save(entity)
+    return { name, address, created_by: token.sub, id: identifiers[0].id }
   }
 
-  findAll() {
-    return this.locationsRepository.find()
+  findAll(id: number) {
+    return this.locationsRepository.find({ where: { created_by: id } })
   }
 
   findOne(id: number) {
     return this.locationsRepository.findOne({ where: { id } })
   }
 
-  update(id: number, updateLocationInput: UpdateLocationInput) {
-    return `This action updates a #${id} location`;
+  async update(id: number, updateLocationInput: UpdateLocationInput) {
+    const { name, address } = updateLocationInput;
+    const result = await this.locationsRepository
+      .createQueryBuilder().update(Location).set({
+        name,
+        address
+      })
+      .where({ id })
+      .returning(["name", "address", "id"]).execute()
+
+    if (!result.affected) {
+      throw new NotFoundException()
+    }
+
+    return result.raw[0]
   }
 
   remove(id: number) {
-    return `This action removes a #${id} location`;
+    return this.locationsRepository.delete(id)
   }
 }
