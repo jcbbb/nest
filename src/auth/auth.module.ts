@@ -10,6 +10,7 @@ import { jwtConfig } from 'src/config/config';
 
 @Module({
   imports: [
+    UsersModule,
     JwtModule.registerAsync({
       imports: [ConfigModule.forRoot({
         load: [jwtConfig],

@@ -7,6 +7,7 @@ import { UsersService } from 'src/users/users.service';
 import { Inject } from '@nestjs/common';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 import { LocationsService } from 'src/locations/locations.service';
+import { FilterEventInput } from './dto/filter-event.input';
 
 @Resolver(() => Event)
 export class EventsResolver {
@@ -23,8 +24,8 @@ export class EventsResolver {
   }
 
   @Query(() => [Event], { name: 'events' })
-  findAll(@Context("token") token: DecodedToken) {
-    return this.eventsService.findAll(token.sub);
+  findAll(@Args('filterEventInput', { nullable: true }) filterEventInput: FilterEventInput, @Context("token") token: DecodedToken) {
+    return this.eventsService.findAll(token.sub, filterEventInput);
   }
 
   @Query(() => Event, { name: 'event' })
