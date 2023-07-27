@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateEventInput } from './dto/create-event.input';
 import { UpdateEventInput } from './dto/update-event.input';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
@@ -7,13 +7,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 import { FilterEventInput } from './dto/filter-event.input';
 import { Action, AppAbility } from 'src/casl/interfaces/casl.interface';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
-export class EventsService {
+export class EventsService implements OnModuleInit {
   constructor(
     @InjectRepository(Event)
     private readonly eventsRepository: Repository<Event>,
+    @Inject("NOTIFICATION_SERVICE") private client: ClientProxy
   ) { }
+
+  // Very important! Spent 4-5 hours on this
+  onModuleInit() {
+    this.client.connect();
+  }
 
   async create(createEventInput: CreateEventInput, token: DecodedToken) {
     const { title, description, end_at, start_at, location_id } = createEventInput;

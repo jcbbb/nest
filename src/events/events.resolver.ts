@@ -4,7 +4,7 @@ import { DeletedEvent, Event } from './entities/event.entity';
 import { CreateEventInput } from './dto/create-event.input';
 import { UpdateEventInput } from './dto/update-event.input';
 import { UsersService } from 'src/users/users.service';
-import { Inject, UseGuards } from '@nestjs/common';
+import { Inject, Injectable, UseGuards } from '@nestjs/common';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 import { LocationsService } from 'src/locations/locations.service';
 import { FilterEventInput } from './dto/filter-event.input';
@@ -12,13 +12,14 @@ import { PolicyGuard } from 'src/auth/policy.guard';
 import { CheckPolicies } from 'src/auth/decorators/policy.decorator';
 import { Action, AppAbility } from 'src/casl/interfaces/casl.interface';
 
+@Injectable()
 @Resolver(() => Event)
 export class EventsResolver {
   constructor(
     @Inject(UsersService)
     private readonly usersService: UsersService,
     private readonly eventsService: EventsService,
-    private readonly locationsService: LocationsService,
+    private readonly locationsService: LocationsService
   ) { }
 
   @UseGuards(PolicyGuard)
@@ -29,7 +30,7 @@ export class EventsResolver {
   }
 
   @Query(() => [Event], { name: 'events' })
-  findAll(@Args('filterEventInput', { nullable: true }) filterEventInput: FilterEventInput, @Context("token") token: DecodedToken) {
+  async findAll(@Args('filterEventInput', { nullable: true }) filterEventInput: FilterEventInput, @Context("token") token: DecodedToken) {
     return this.eventsService.findAll(token.sub, filterEventInput);
   }
 
