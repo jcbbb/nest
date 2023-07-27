@@ -24,8 +24,8 @@ import { CaslModule } from './casl/casl.module';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [dbConfig, httpConfig],
-      envFilePath: `${process.cwd()}/.env.${process.env.NODE_ENV || 'development'
-        }`,
+      envFilePath: join(`${process.cwd()}/.env.${process.env.NODE_ENV || 'development'
+        }`),
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
