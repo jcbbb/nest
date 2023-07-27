@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
 import { jwtConfig } from 'src/config/config';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -14,8 +15,7 @@ import { jwtConfig } from 'src/config/config';
     JwtModule.registerAsync({
       imports: [ConfigModule.forRoot({
         load: [jwtConfig],
-        envFilePath: `${process.cwd()}/.env.${process.env.NODE_ENV || 'development'
-          }`,
+        envFilePath: join(process.cwd(), ".env." + process.env.NODE_ENV || "development"),
       })],
       useFactory: (configService: ConfigService) => configService.get("jwt"),
       inject: [ConfigService]

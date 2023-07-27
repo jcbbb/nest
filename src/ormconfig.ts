@@ -6,8 +6,7 @@ import { join } from "path";
 ConfigModule.forRoot({
   isGlobal: true,
   load: [dbConfig],
-  envFilePath: `${process.cwd()}/.env.${process.env.NODE_ENV || 'development'
-    }`,
+  envFilePath: join(process.cwd(), ".env." + process.env.NODE_ENV || "development"),
 });
 
 export default new DataSource({
