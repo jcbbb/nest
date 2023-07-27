@@ -1,5 +1,11 @@
 import { registerAs } from "@nestjs/config";
 
+export const httpConfig = registerAs("http", () => {
+  const port = Number(process.env.PORT);
+  return {
+    port: isNaN(port) ? 3000 : port
+  }
+})
 export const dbConfig = registerAs("database", () => {
   return {
     type: "postgres",

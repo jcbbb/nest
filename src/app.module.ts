@@ -9,7 +9,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { UsersModule } from './users/users.module';
-import { dbConfig } from './config/config';
+import { dbConfig, httpConfig } from './config/config';
 import { AuthModule } from './auth/auth.module';
 import { CaslModule } from './casl/casl.module';
 
@@ -23,7 +23,7 @@ import { CaslModule } from './casl/casl.module';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [dbConfig],
+      load: [dbConfig, httpConfig],
       envFilePath: `${process.cwd()}/.env.${process.env.NODE_ENV || 'development'
         }`,
     }),
