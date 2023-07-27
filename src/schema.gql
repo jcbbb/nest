@@ -45,8 +45,6 @@ type Auth {
 type Query {
   events(filterEventInput: FilterEventInput): [Event!]!
   event(id: Int!): Event!
-  users: [User!]!
-  user(id: Int!): User!
   me: User!
   locations: [Location!]!
   location(id: Int!): Location!
@@ -62,9 +60,6 @@ type Mutation {
   createEvent(createEventInput: CreateEventInput!): Event!
   updateEvent(updateEventInput: UpdateEventInput!): Event!
   removeEvent(id: Int!): DeletedEvent!
-  createUser(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User!
   login(authInput: AuthInput!): Auth!
   signup(authInput: AuthInput!): Auth!
   createLocation(createLocationInput: CreateLocationInput!): Location!
@@ -87,17 +82,6 @@ input UpdateEventInput {
   start_at: DateTime
   location_id: Float
   id: Float!
-}
-
-input CreateUserInput {
-  username: String!
-  password: String!
-}
-
-input UpdateUserInput {
-  username: String
-  password: String
-  id: Int!
 }
 
 input AuthInput {

@@ -13,9 +13,10 @@ export class Initial1690277582986 implements MigrationInterface {
         id serial primary key,
         name varchar(255) not null,
         address varchar(255) not null,
-        created_y int not null,
+        created_by int not null,
 
-        constraint fk_users_id foreign key (created_by) references users(id) on delete cascade
+        constraint fk_users_id foreign key (created_by) references users(id) on delete cascade,
+        constraint uq_id_created_by unique(id, created_by)
       );
 
       create table if not exists events (
@@ -27,7 +28,7 @@ export class Initial1690277582986 implements MigrationInterface {
         created_by int not null,
         location_id int not null,
         constraint fk_events_creator foreign key (created_by) references users(id) on delete cascade,
-        constraint fk_events_location foreign key (location_id) references locations(id) on delete cascade
+        constraint fk_events_location foreign key (location_id, created_by) references locations(id, created_by) on delete cascade
       );
 
       create table if not exists event_participants (

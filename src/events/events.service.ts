@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventInput } from './dto/create-event.input';
 import { UpdateEventInput } from './dto/update-event.input';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
@@ -6,6 +6,7 @@ import { Event } from './entities/event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 import { FilterEventInput } from './dto/filter-event.input';
+import { Action, AppAbility } from 'src/casl/interfaces/casl.interface';
 
 @Injectable()
 export class EventsService {
@@ -44,13 +45,17 @@ export class EventsService {
     return qb.getMany()
   }
 
-  async findOne(id: number) {
-    const result = await this.eventsRepository.findOne({ where: { id } })
-    if (!result) throw new NotFoundException()
-    return result;
+  async findOne(ability: AppAbility, id: number) {
+    const event = await this.eventsRepository.findOne({ where: { id } });
+    if (!event) throw new NotFoundException();
+    if (!ability.can(Action.Read, event)) throw new ForbiddenException();
+    return event;
   }
 
-  async update(id: number, updateEventInput: UpdateEventInput) {
+  async update(ability: AppAbility, id: number, updateEventInput: UpdateEventInput) {
+    const event = await this.findOne(ability, id);
+    if (!ability.can(Action.Update, event)) throw new ForbiddenException();
+
     const { title, description, end_at, start_at, location_id } = updateEventInput;
     const result = await this.eventsRepository.createQueryBuilder().update(Event).set({
       title,
@@ -62,14 +67,12 @@ export class EventsService {
       .where({ id })
       .returning(["title", "description", "end_at", "start_at", "location_id", "id"]).execute()
 
-    if (!result.affected) {
-      throw new NotFoundException()
-    }
-
     return result.raw[0]
   }
 
-  remove(id: number) {
+  async remove(ability: AppAbility, id: number) {
+    const event = await this.findOne(ability, id);
+    if (!ability.can(Action.Delete, event)) throw new ForbiddenException();
     return this.eventsRepository.delete(id);
   }
 

@@ -6,8 +6,8 @@ import { UpdateLocationInput } from './dto/update-location.input';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 import { PolicyGuard } from 'src/auth/policy.guard';
 import { CheckPolicies } from 'src/auth/decorators/policy.decorator';
-import { Action, AppAbility } from 'src/casl/casl-ability.factory';
 import { UseGuards } from '@nestjs/common';
+import { Action, AppAbility } from 'src/casl/interfaces/casl.interface';
 
 @Resolver(() => Location)
 export class LocationsResolver {
@@ -26,18 +26,31 @@ export class LocationsResolver {
   @UseGuards(PolicyGuard)
   @CheckPolicies((ability: AppAbility) => ability.can(Action.Read, Location))
   @Query(() => Location, { name: 'location' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.locationsService.findOne(id);
+  findOne(
+    @Args('id', { type: () => Int }) id: number,
+    @Context("userAbility") ability: AppAbility
+  ) {
+    return this.locationsService.findOne(ability, id);
   }
 
+  @UseGuards(PolicyGuard)
+  @CheckPolicies((ability: AppAbility) => ability.can(Action.Update, Location))
   @Mutation(() => Location)
-  updateLocation(@Args('updateLocationInput') updateLocationInput: UpdateLocationInput) {
-    return this.locationsService.update(updateLocationInput.id, updateLocationInput);
+  updateLocation(
+    @Args('updateLocationInput') updateLocationInput: UpdateLocationInput,
+    @Context("userAbility") ability: AppAbility
+  ) {
+    return this.locationsService.update(ability, updateLocationInput.id, updateLocationInput);
   }
 
+  @UseGuards(PolicyGuard)
+  @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, Location))
   @Mutation(() => DeletedLocation)
-  async removeLocation(@Args('id', { type: () => Int }) id: number) {
-    await this.locationsService.remove(id);
+  async removeLocation(
+    @Args("id", { type: () => Int }) id: number,
+    @Context("userAbility") ability: AppAbility
+  ) {
+    await this.locationsService.remove(ability, id);
     return { id }
   }
 }
