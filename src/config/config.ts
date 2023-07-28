@@ -1,5 +1,4 @@
 import { registerAs } from "@nestjs/config";
-import { Transport } from "@nestjs/microservices";
 
 export const httpConfig = registerAs("http", () => {
   const port = Number(process.env.PORT);
@@ -11,11 +10,8 @@ export const httpConfig = registerAs("http", () => {
 export const redisConfig = registerAs("redis", () => {
   const port = Number(process.env.REDIS_PORT);
   return {
-    transport: Transport.REDIS,
-    options: {
-      host: process.env.REDIS_HOST || "localhost",
-      port: isNaN(port) ? 6379 : port
-    }
+    host: process.env.REDIS_HOST || "localhost",
+    port: isNaN(port) ? 6379 : port
   }
 });
 

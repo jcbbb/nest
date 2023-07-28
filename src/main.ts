@@ -8,8 +8,6 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
-  app.connectMicroservice(configService.get("redis"), { inheritAppConfig: true });
-  await app.startAllMicroservices();
 
   await app.listen(configService.get("http.port"));
 }

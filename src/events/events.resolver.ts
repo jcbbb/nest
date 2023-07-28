@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent, Context, Subscription } from '@nestjs/graphql';
 import { EventsService } from './events.service';
 import { DeletedEvent, Event } from './entities/event.entity';
 import { CreateEventInput } from './dto/create-event.input';
@@ -11,16 +11,27 @@ import { FilterEventInput } from './dto/filter-event.input';
 import { PolicyGuard } from 'src/auth/policy.guard';
 import { CheckPolicies } from 'src/auth/decorators/policy.decorator';
 import { Action, AppAbility } from 'src/casl/interfaces/casl.interface';
+import { User } from 'src/users/entities/user.entity';
+import { RedisPubSub } from "graphql-redis-subscriptions";
+import { AddParticipantInput } from './dto/add-participant.input';
 
 @Injectable()
 @Resolver(() => Event)
 export class EventsResolver {
   constructor(
-    @Inject(UsersService)
-    private readonly usersService: UsersService,
+    @Inject("PUB_SUB") private readonly pubSub: RedisPubSub,
+    @Inject(UsersService) private readonly usersService: UsersService,
     private readonly eventsService: EventsService,
-    private readonly locationsService: LocationsService
+    private readonly locationsService: LocationsService,
   ) { }
+
+  @Subscription(() => User, {
+    filter: (payload, variables) => payload.event === variables.event
+  })
+
+  participantAdded(@Args("event", { type: () => Int }) event: number) {
+    return this.pubSub.asyncIterator("participantAdded")
+  }
 
   @UseGuards(PolicyGuard)
   @CheckPolicies((ability: AppAbility) => ability.can(Action.Create, Event))
@@ -32,6 +43,13 @@ export class EventsResolver {
   @Query(() => [Event], { name: 'events' })
   async findAll(@Args('filterEventInput', { nullable: true }) filterEventInput: FilterEventInput, @Context("token") token: DecodedToken) {
     return this.eventsService.findAll(token.sub, filterEventInput);
+  }
+
+  @Mutation(() => User)
+  async addParticipant(@Args("addParticipantInput") addParticipantInput: AddParticipantInput) {
+    const user = await this.eventsService.addParticipant(addParticipantInput)
+    this.pubSub.publish("participantAdded", { participantAdded: user, event: addParticipantInput.event })
+    return user;
   }
 
   @UseGuards(PolicyGuard)

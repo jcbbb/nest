@@ -58,6 +58,7 @@ input FilterEventInput {
 
 type Mutation {
   createEvent(createEventInput: CreateEventInput!): Event!
+  addParticipant(addParticipantInput: AddParticipantInput!): User!
   updateEvent(updateEventInput: UpdateEventInput!): Event!
   removeEvent(id: Int!): DeletedEvent!
   login(authInput: AuthInput!): Auth!
@@ -73,6 +74,11 @@ input CreateEventInput {
   end_at: DateTime!
   start_at: DateTime!
   location_id: Float!
+}
+
+input AddParticipantInput {
+  id: Float!
+  event: Float!
 }
 
 input UpdateEventInput {
@@ -98,4 +104,8 @@ input UpdateLocationInput {
   name: String
   address: String
   id: Float!
+}
+
+type Subscription {
+  participantAdded(event: Int!): User!
 }

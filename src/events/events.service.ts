@@ -1,4 +1,4 @@
-import { ForbiddenException, Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventInput } from './dto/create-event.input';
 import { UpdateEventInput } from './dto/update-event.input';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
@@ -7,20 +7,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 import { FilterEventInput } from './dto/filter-event.input';
 import { Action, AppAbility } from 'src/casl/interfaces/casl.interface';
-import { ClientProxy } from '@nestjs/microservices';
+import { AddParticipantInput } from './dto/add-participant.input';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
-export class EventsService implements OnModuleInit {
+export class EventsService {
   constructor(
     @InjectRepository(Event)
     private readonly eventsRepository: Repository<Event>,
-    @Inject("NOTIFICATION_SERVICE") private client: ClientProxy
+    private readonly usersUservice: UsersService
   ) { }
-
-  // Very important! Spent 4-5 hours on this
-  onModuleInit() {
-    this.client.connect();
-  }
 
   async create(createEventInput: CreateEventInput, token: DecodedToken) {
     const { title, description, end_at, start_at, location_id } = createEventInput;
@@ -50,6 +46,16 @@ export class EventsService implements OnModuleInit {
     }
 
     return qb.getMany()
+  }
+
+  async addParticipant(addParticipantInput: AddParticipantInput) {
+    await this.eventsRepository
+      .createQueryBuilder()
+      .relation(Event, "participants")
+      .of(addParticipantInput.event)
+      .add(addParticipantInput.id)
+
+    return this.usersUservice.findOne(addParticipantInput.id);
   }
 
   async findOne(ability: AppAbility, id: number) {

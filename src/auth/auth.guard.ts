@@ -10,6 +10,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './decorators/public.decorator';
+import { Context } from 'graphql-ws';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -48,8 +49,15 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+  private extractTokenFromHeader(request: Request | Context): string | undefined {
+    let authHeader
+    if ("connectionParams" in request) {
+      authHeader = request.connectionParams.authToken;
+    } else if ("headers" in request) {
+      authHeader = request.headers.authorization;
+    }
+
+    const [type, token] = authHeader?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }
 }

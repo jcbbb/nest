@@ -9,18 +9,23 @@ import { JwtService } from '@nestjs/jwt';
 import { LocationsModule } from 'src/locations/locations.module';
 import { CaslModule } from 'src/casl/casl.module';
 import { ConfigService } from '@nestjs/config';
-import { ClientProxyFactory } from '@nestjs/microservices';
+import { RedisPubSub } from "graphql-redis-subscriptions";
+import Redis from "ioredis";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Event]), UsersModule, AuthModule, LocationsModule, CaslModule],
   providers: [EventsResolver, EventsService, JwtService,
     {
-      provide: "NOTIFICATION_SERVICE",
+      provide: "PUB_SUB",
       useFactory: (configService: ConfigService) => {
-        return ClientProxyFactory.create(configService.get("redis"))
+        const options = configService.get("redis");
+        return new RedisPubSub({
+          publisher: new Redis(options),
+          subscriber: new Redis(options)
+        })
       },
       inject: [ConfigService]
-    }
+    },
   ],
 })
 export class EventsModule { }

@@ -19,7 +19,16 @@ import { CaslModule } from './casl/casl.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       includeStacktraceInErrorResponses: false,
-      context: ({ req, res }) => ({ req, res })
+      context: ({ req, res }) => ({ req, res }),
+      installSubscriptionHandlers: true,
+      playground: {
+        subscriptionEndpoint: "/subscriptions"
+      },
+      subscriptions: {
+        "graphql-ws": {
+          path: "/subscriptions",
+        },
+      }
     }),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -38,6 +47,6 @@ import { CaslModule } from './casl/casl.module';
     CaslModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService]
 })
 export class AppModule { }
