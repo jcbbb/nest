@@ -32,16 +32,16 @@ export class EventsService {
     return { title, description, end_at, start_at, location_id, created_by: token.sub, id: identifiers[0].id }
   }
 
-  async findAll(id: number, filterEventInput: FilterEventInput) {
+  async findAll(id: number, filterEventInput?: FilterEventInput) {
     let qb = this.eventsRepository.createQueryBuilder().where({ created_by: id });
-    if (filterEventInput.end_at) {
+    if (filterEventInput?.end_at) {
       qb.andWhere({ end_at: LessThanOrEqual(filterEventInput.end_at) })
     }
-    if (filterEventInput.start_at) {
+    if (filterEventInput?.start_at) {
       qb.andWhere({ start_at: MoreThanOrEqual(filterEventInput.start_at) })
     }
 
-    if (filterEventInput.location_id) {
+    if (filterEventInput?.location_id) {
       qb.andWhere({ location_id: filterEventInput.location_id })
     }
 
