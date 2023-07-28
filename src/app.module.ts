@@ -21,6 +21,7 @@ import { CaslModule } from './casl/casl.module';
       includeStacktraceInErrorResponses: false,
       context: ({ req, res }) => ({ req, res }),
       installSubscriptionHandlers: true,
+      introspection: true,
       playground: {
         subscriptionEndpoint: "/subscriptions"
       },
