@@ -6,12 +6,14 @@ import { Repository } from 'typeorm';
 import { Location } from './entities/location.entity';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 import { Action, AppAbility } from 'src/casl/interfaces/casl.interface';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Injectable()
 export class LocationsService {
   constructor(
     @InjectRepository(Location)
     private readonly locationsRepository: Repository<Location>,
+    private readonly socketGateway: SocketGateway
   ) { }
   async create(createLocationInput: CreateLocationInput, token: DecodedToken) {
     const { name, address } = createLocationInput;

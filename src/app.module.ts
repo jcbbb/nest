@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { dbConfig, httpConfig, redisConfig } from './config/config';
 import { AuthModule } from './auth/auth.module';
 import { CaslModule } from './casl/casl.module';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { CaslModule } from './casl/casl.module';
     UsersModule,
     AuthModule,
     CaslModule,
+    SocketModule
   ],
   controllers: [AppController],
   providers: [AppService]
