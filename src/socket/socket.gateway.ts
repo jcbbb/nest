@@ -3,7 +3,6 @@ import { JwtService } from "@nestjs/jwt";
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { ClientToServerEvents, ExtendedSocket, LocationCreated, LocationEdit, LocationRemoved, ServerToClientEvents } from "./interfaces/socket.interface";
 import { Server } from "socket.io";
-import { Location } from "src/locations/interfaces/location.interface";
 
 @WebSocketGateway({
   cors: true

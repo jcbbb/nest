@@ -1,16 +1,14 @@
-import { ConfigModule } from "@nestjs/config";
-import { dbConfig } from "./config/config";
 import { DataSource, DataSourceOptions } from "typeorm";
 import { join } from "path";
+import * as dotenv from "dotenv";
 
-ConfigModule.forRoot({
-  isGlobal: true,
-  load: [dbConfig],
-  envFilePath: join(process.cwd(), ".env." + process.env.NODE_ENV || "development"),
-});
+dotenv.config({
+  path: join(process.cwd(), ".env." + (process.env.NODE_ENV || "development"))
+})
 
 export default new DataSource({
-  ...dbConfig(),
+  type: "postgres",
+  url: process.env.POSTGRES_URI,
   entities: ['**/*.entity*{.js,.ts}'],
   migrations: [__dirname + '/migrations/*{.js,.ts}'],
   cli: {

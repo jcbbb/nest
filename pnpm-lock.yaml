@@ -43,6 +43,9 @@ dependencies:
   argon2:
     specifier: ^0.30.3
     version: 0.30.3
+  dotenv:
+    specifier: ^16.3.1
+    version: 16.3.1
   graphql:
     specifier: ^16.7.1
     version: 16.7.1
