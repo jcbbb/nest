@@ -31,6 +31,7 @@ export interface ClientToServerEvents {
 export interface ServerToClientEvents {
   locationCreated: (location: Location) => void
   locationRemoved: (id: number) => void
+  locationUpdated: (location: Pick<Location, "status" | "id">) => void
   eventCreated: () => Event
   eventRemoved: () => number
 }

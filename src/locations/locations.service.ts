@@ -7,24 +7,29 @@ import { Location } from './entities/location.entity';
 import { DecodedToken } from 'src/auth/interfaces/auth.interface';
 import { Action, AppAbility } from 'src/casl/interfaces/casl.interface';
 import { SocketGateway } from 'src/socket/socket.gateway';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from "bull";
 
 @Injectable()
 export class LocationsService {
   constructor(
     @InjectRepository(Location)
     private readonly locationsRepository: Repository<Location>,
-    private readonly socketGateway: SocketGateway
+    private readonly socketGateway: SocketGateway,
+    @InjectQueue("location") private readonly locationQueue: Queue
   ) { }
   async create(createLocationInput: CreateLocationInput, token: DecodedToken) {
     const { name, address } = createLocationInput;
-    const { identifiers } = await this.locationsRepository
+    const { identifiers, raw } = await this.locationsRepository
       .createQueryBuilder()
       .insert()
       .into(Location)
       .values({ name, address, created_by: token.sub })
+      .returning(["status"])
       .execute()
 
-    return { name, address, created_by: token.sub, id: identifiers[0].id }
+    const result = await this.locationQueue.add("location", { name, address, created_by: token.sub, id: identifiers[0].id, status: raw[0].status })
+    return { name, address, created_by: token.sub, id: identifiers[0].id, status: raw[0].status }
   }
 
   findAll(id: number) {

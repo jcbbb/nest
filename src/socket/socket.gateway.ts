@@ -29,8 +29,8 @@ export class SocketGateway implements OnGatewayConnection {
         secret: this.configService.get("jwt.secret")
       })
 
-      socket.data
       socket.token = payload;
+      socket.join(String(payload.sub))
       this.prefix = payload.sub;
     } catch (err) {
       socket.disconnect()
@@ -51,7 +51,6 @@ export class SocketGateway implements OnGatewayConnection {
   locationCreated(socket: ExtendedSocket, data: LocationCreated) {
     socket.broadcast.to(this.prefixTopic(data.topic)).emit("locationCreated", data.location)
   }
-
 
   @SubscribeMessage("subscribe")
   subscribe(socket: ExtendedSocket, topics: string[]) {

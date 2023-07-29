@@ -3,5 +3,6 @@ export interface Location {
   name: string;
   created_by: number;
   address: string;
+  status: string;
 }
 

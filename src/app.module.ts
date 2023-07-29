@@ -13,6 +13,7 @@ import { dbConfig, httpConfig, redisConfig } from './config/config';
 import { AuthModule } from './auth/auth.module';
 import { CaslModule } from './casl/casl.module';
 import { SocketModule } from './socket/socket.module';
+import { BullModule } from "@nestjs/bull";
 
 @Module({
   imports: [
@@ -41,6 +42,11 @@ import { SocketModule } from './socket/socket.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => configService.get("database"),
       inject: [ConfigService],
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService) => ({ redis: configService.get("redis") }),
+      inject: [ConfigService]
     }),
     EventsModule,
     LocationsModule,

@@ -5,10 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Location } from './entities/location.entity';
 import { CaslModule } from 'src/casl/casl.module';
 import { SocketModule } from 'src/socket/socket.module';
+import { BullModule } from '@nestjs/bull';
+import { LocationProcessor } from './location.processor';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Location]), CaslModule, SocketModule],
-  providers: [LocationsResolver, LocationsService],
+  imports: [
+    TypeOrmModule.forFeature([Location]),
+    CaslModule,
+    SocketModule,
+    BullModule.registerQueue({ name: "location" })
+  ],
+  providers: [LocationsResolver, LocationsService, LocationProcessor],
   exports: [LocationsService]
 })
 export class LocationsModule { }

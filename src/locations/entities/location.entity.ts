@@ -30,6 +30,10 @@ export class Location {
   @Column({ length: 255 })
   @Field()
   address: string;
+
+  @Column({ length: 255 })
+  @Field()
+  status: string;
 }
 
 @ObjectType()
