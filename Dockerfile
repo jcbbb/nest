@@ -18,6 +18,8 @@ WORKDIR /usr/src/app
 COPY --from=base /usr/src/app/dist ./dist
 COPY --from=base /usr/src/app/node_modules ./node_modules
 COPY --from=base /usr/src/app/package*.json ./
+COPY --from=base /usr/src/app/startup.sh ./
 
-CMD ["pnpm", "migration:run"]
-CMD ["node", "dist/main.js"]
+RUN chmod +x ./startup.sh 
+
+CMD ["./startup.sh"]
