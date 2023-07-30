@@ -16,10 +16,9 @@ export class SocketGateway implements OnGatewayConnection {
 
   @WebSocketServer()
   public server: Server<ClientToServerEvents, ServerToClientEvents>;
-  private prefix: string = "";
 
-  private prefixTopic(topic: string): string {
-    return this.prefix + topic
+  private prefix(socket: ExtendedSocket, topic: string = ""): string {
+    return socket.token.sub + topic
   }
 
   async handleConnection(socket: ExtendedSocket) {
@@ -30,8 +29,7 @@ export class SocketGateway implements OnGatewayConnection {
       })
 
       socket.token = payload;
-      socket.join(String(payload.sub))
-      this.prefix = payload.sub;
+      socket.join(this.prefix(socket))
     } catch (err) {
       socket.disconnect()
     }
@@ -39,26 +37,31 @@ export class SocketGateway implements OnGatewayConnection {
 
   @SubscribeMessage("locationEditing")
   locationEditing(socket: ExtendedSocket, edit: LocationEdit) {
-    socket.broadcast.to(this.prefixTopic(edit.topic)).emit("locationEditing", edit.update);
+    socket.broadcast.to(this.prefix(socket, edit.topic)).emit("locationEditing", edit.update);
   }
 
   @SubscribeMessage("locationRemoved")
   removeLocation(socket: ExtendedSocket, data: LocationRemoved) {
-    socket.broadcast.to(this.prefixTopic(data.topic)).emit("locationRemoved", data.id)
+    socket.broadcast.to(this.prefix(socket, data.topic)).emit("locationRemoved", data.id)
   }
 
   @SubscribeMessage("locationCreated")
   locationCreated(socket: ExtendedSocket, data: LocationCreated) {
-    socket.broadcast.to(this.prefixTopic(data.topic)).emit("locationCreated", data.location)
+    socket.broadcast.to(this.prefix(socket, data.topic)).emit("locationCreated", data.location)
+  }
+
+  @SubscribeMessage("locationUpdated")
+  locationUpdated(socket: ExtendedSocket, data: LocationEdit) {
+    socket.broadcast.to(this.prefix(socket, data.topic)).emit("locationUpdated", data.update)
   }
 
   @SubscribeMessage("subscribe")
   subscribe(socket: ExtendedSocket, topics: string[]) {
-    for (const topic of topics) socket.join(this.prefixTopic(topic))
+    for (const topic of topics) socket.join(this.prefix(socket, topic))
   }
 
   @SubscribeMessage("unsubscribe")
   unsubscribe(socket: ExtendedSocket, topics: string[]) {
-    for (const topic of topics) socket.leave(this.prefixTopic(topic))
+    for (const topic of topics) socket.leave(this.prefix(socket, topic))
   }
 }
